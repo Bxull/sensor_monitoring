@@ -22,32 +22,27 @@ public class MeasurementController {
     @Autowired
     private SensorService sensorService;
 
-    // Метод для добавления измерения
     @PostMapping("/add")
     @ResponseStatus(HttpStatus.CREATED)
     public Measurement addMeasurement(@RequestBody @Valid MeasurementDTO measurementDTO) {
-        // Получаем сенсор из базы данных по имени
         Sensor sensor = sensorService.getSensorByName(measurementDTO.getSensor().getName())
                 .orElseThrow(() -> new RuntimeException("Sensor not found"));
 
-        // Создаем объект Measurement без времени
         Measurement measurement = Measurement.builder()
                 .value(measurementDTO.getValue())
                 .raining(measurementDTO.isRaining())
                 .sensor(sensor)
                 .build();
 
-        // Сохраняем измерение в базе данных
         return measurementService.saveMeasurement(measurement);
     }
 
-    // Получение всех измерений
+
     @GetMapping
     public List<Measurement> getAllMeasurements() {
         return measurementService.getAllMeasurements();
     }
 
-    // Подсчет количества дождливых дней
     @GetMapping("/rainyDaysCount")
     public long getRainyDaysCount() {
         return measurementService.countRainyDays();
